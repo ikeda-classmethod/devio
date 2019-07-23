@@ -1,0 +1,408 @@
+'.source.python':
+    'py_imp_std':
+        'prefix': 'importstd'
+        'body':"""
+                ${1:import copy
+                }${2:import csv
+                }${3:import json
+                }${4:import math
+                }${5:import os
+                }${6:import re
+                }${7:import shutil
+                }${8:import string
+                }${9:import sys
+                }${10:import traceback
+                }${11:from datetime import date
+                }${12:from datetime import datetime, timedelta, timezone
+                }
+               """
+    'py_imp_3rd':
+        'prefix': 'import3rd'
+        'body':"""
+                ${1:import boto3
+                }${2:import numpy as np
+                }${3:import pandas as pd
+                }${4:import requests
+                }${5:import scipy as sp
+                }${6:from bs4 import BeautifulSoup
+                }${7:from matplotlib import pyplot as plt
+                }
+               """
+
+    'py_option_end':
+        'prefix': 'end'
+        'body':'${1:, }end="$2"'
+    'py_option_sep':
+        'prefix': 'sep'
+        'body':'${1:, }sep="$2"'
+    'py_option_flush':
+        'prefix': 'flush'
+        'body':'${1:, }flush=True$2'
+    'py_option_reverse':
+        'prefix': 'reverse'
+        'body':'${1:, }reverse=True$2'
+
+    'py_input':
+        'prefix': 'input'
+        'body':'$1input($2).rstrip()$3'
+    'py_input_int':
+        'prefix': 'inputint'
+        'body':'$1int(input($2).rstrip())$3'
+    'py_stdin':
+        'prefix': 'stdincsv'
+        'body':"""
+                ${1:import sys
+                }${3:lines} = []
+                for line in sys.stdin.readlines():
+                    lines.append(line.rstrip().split("${2:,}"))
+                
+               """
+
+    'py_for_range':
+        'prefix': 'forrange'
+        'body':"""
+                for i in range($1):
+                    ${2:pass}
+                
+               """
+    'py_for_len':
+        'prefix': 'forlen'
+        'body':"""
+                for i in range(len($1)):
+                    ${2:print(i)}
+                
+               """
+    'py_for_dict':
+        'prefix': 'fordict'
+        'body':"""
+                for (k, v) in ${1:dict}.items():
+                    ${2:print(k, v, sep=": ")}
+                
+               """
+    'py_for_enumerate':
+        'prefix': 'forenumerate'
+        'body':"""
+                for (i, v) in enumerate(${1:list}):
+                    ${2:print(i, v, sep=": ")}
+                
+               """
+
+    'py_randrange':
+        'prefix': 'randrange'
+        'body':"""
+                ${1:import random
+                }${2:# random.seed(0)
+                }${3:rand} = random.randrange(${4:0}, ${5:11}, ${6:2})
+               """
+
+    'py_datetime_now':
+        'prefix': 'now'
+        'body':"""
+                ${1:from datetime import datetime, timedelta, timezone
+                }${2:now} = datetime.now(timezone(timedelta(hours=9)))
+               """
+    'py_datetime_date':
+        'prefix': 'datetime'
+        'body':"""
+                ${1:from datetime import datetime
+                }${2:date} = datetime.strptime("2020$3/01/01 00:00:00", "%Y/%m/%d %H:%M:%S")
+               """
+    'py_datetime_today':
+        'prefix': 'today'
+        'body':"""
+                ${1:from datetime import date
+                }${2:today} = date.today()
+               """
+    'py_datetime_strftime':
+        'prefix': 'strftime'
+        'body':'strftime("%Y-%m-%d %H:%M:%S")'
+
+    'py_file_write':
+        'prefix': 'filewrite'
+        'body':"""
+                with open("${1:.\\\\\\\\tmp.txt}", "a", encoding="utf-8") as ${2:w_file}:
+                    ${2:w_file}.write("$3")$4
+                
+               """
+    'py_file_read':
+        'prefix': 'fileread'
+        'body':"""
+                with open("${1:.\\\\\\\\tmp.txt}", "r", encoding="utf-8") as ${2:r_file}:
+                    ${3:txt} = ${2:r_file}.read()$4
+                
+               """
+
+    'py_os_cd':
+        'prefix': 'oscd'
+        'body':"""
+                ${1:import os
+                }os.chdir(os.path.dirname(os.path.realpath(__file__)))$2
+               """
+
+    'py_re_sentence2words':
+        'prefix': 'resentence2words'
+        'body':"""
+                ${1:import re
+                }${2:words} = [${4:re.sub("[^a-zA-Z]", "", i)} for i in re.split("[,\\\\\\\\s\\\\\\\\.]", ${3:sentence}) if i]$5
+               """
+
+    'py_json_dumps':
+        'prefix': 'jsondumpsencode'
+        'body':"""
+                ${1:import json
+                }${2:json_str} = json.dumps(${3:json_body}, indent=2, ensure_ascii=False)$4
+               """
+
+    'py_try':
+        'prefix': 'try'
+        'body':"""
+                ${1:import traceback
+                }try:$6
+                    ${2:pass}
+                
+                except Exception as e:
+                    print(traceback.format_exc())
+                    ${4:# }traceback.print_exc()
+                    ${5:raise e}
+                ${3:
+                finally:
+                    pass}
+                
+               """
+
+    'py_def_function':
+        'prefix': 'deffunction'
+        'body':"""
+                def ${1:my_fn}(${2:*args}):
+                    ${3:print(args)}
+                
+                
+               """
+    'py_def_instancemethod':
+        'prefix': 'definstancemethod'
+        'body':"""
+                def ${1:my_method}(self${2:, *args}):
+                    ${3:pass}
+                
+                
+               """
+    'py_def_classmethod':
+        'prefix': 'defclassmethod'
+        'body':"""
+                @classmethod
+                def ${1:my_cm}(cls${2:, *args}):
+                    ${3:pass}
+                
+                
+               """
+    'py_def_staticmethod':
+        'prefix': 'defstaticmethod'
+        'body':"""
+                @staticmethod
+                def ${1:my_sm}(${2:*args}):
+                    ${3:pass}
+                
+                
+               """
+
+    'py_class_exception':
+        'prefix': 'classexception'
+        'body':"""
+                class ${1:MyException}(${2:Exception}):
+                    pass
+                
+                
+               """
+    'py_class_new':
+        'prefix': 'classnew'
+        'body':"""
+                class ${1:MyCls}(${2:object}):
+
+                    def __init__(self, ${4:arg}):
+                        ${3:super().__init__()
+                        }self.${4:arg} = ${4:arg}
+                
+                    $5
+                
+                
+               """
+
+    'py_fizzbuzz':
+        'prefix': 'fizzbuzz'
+        'body':'for i in range(${1:100}):print(i%3//2*"Fizz"+i%5//4*"Buzz"or-~i)'
+    'py_ngram':
+        'prefix': 'ngram'
+        'body':"""
+                def create_ngram(li, n=2):
+                    return [li[i:i + n] for i in range(len(li) - n + 1)]
+                
+                $1
+               """
+    'py_list_division':
+        'prefix': 'listdivision'
+        'body':"""
+                ${1:list_div} = [${2:li}[i:i + ${3:N}] for i in range(0, len(${2:li}), ${3:N})]
+                $4
+               """
+
+    'py_block':
+        'prefix': 'block'
+        'body':"""
+                ########################################
+                # $1                                     #
+                ########################################
+                $2
+               """
+
+    'py_numpy_xy':
+        'prefix': 'numpyxy'
+        'body':"""
+                ${1:import numpy as np
+                }${2:# np.random.seed(0)}
+                ${3:x} = np.arange(${5:10})
+                ${4:y} = np.random.randint(${6:0}, ${7:10}, ${5:10})$8
+               """
+    'py_pyplot_xy':
+        'prefix': 'pyplotxy'
+        'body':"""
+                ${1:from matplotlib import pyplot as plt
+                plt.style.use("ggplot")
+                }plt.plot(${2:x}, ${3:y})
+                $4plt.show()
+               """
+
+    'py_beautifulsoup_scraping':
+        'prefix': 'beautifulsoupscraping'
+        'body':"""
+                ${1:import requests
+                from bs4 import BeautifulSoup
+                }def ${2:main}():
+                    URL = "${3:https://pycon.jp/2017/ja/sponsors/}"
+                    res = requests.get(URL)
+                    content = res.content
+                    soup = BeautifulSoup(content, "html.parser")
+                    sponsors = soup.find_all("div", class_="sponsor-content")$4
+                    for sponsor in sponsors:
+                        name = sponsor.h4.text
+                        link = sponsor.h3.a["href"]
+                        print(name, link)
+
+
+                ${2:main}()
+                
+               """
+    'py_requests_get':
+        'prefix': 'requestsget'
+        'body':"""
+                ${1:import requests
+                }URL = "${2:http://httpbin.org/get}"
+                params = ${3:\\{"key1": "val1", "key2": "val2"\\}}
+
+                res = requests.get(URL, params=params)
+                print(res.text)$4
+               """
+    'py_requests_post':
+        'prefix': 'requestspost'
+        'body':"""
+                ${1:import requests
+                }URL = "${2:http://httpbin.org/post}"
+                payload = ${3:\\{"key1": "val1", "key2": "val2"\\}}
+
+                res = requests.post(URL, data=payload)
+                print(res.text)$4
+               """
+
+    'py_pandas_init':
+        'prefix': 'pandasinit'
+        'body':"""
+                ${1:import pandas as pd
+                }${2:df} = pd.read_csv("${3:.\\\\\\\\data\\\\\\\\input.csv}", header=${4:0}, sep="${5:,}", encoding="utf-8")
+                $6
+                ${2:df}.shape
+                ${2:df}.info()
+                ${2:df}.describe()
+                ${2:df}.isnull().sum()
+                ${2:df}.head(1)
+                
+                ${2:df}["col1"].unique()
+                ${2:df}["col1"].value_counts()
+               """
+    'py_pandas_read':
+        'prefix': 'pandasreadcsv'
+        'body':"""
+                ${1:df} = pd.read_csv("${2:.\\\\\\\\data\\\\\\\\input.csv}", header=${3:0}, sep="${4:,}", encoding="utf-8")
+                $5
+               """
+    'py_pandas_to':
+        'prefix': 'pandastocsv'
+        'body':"""
+                ${1:df}.to_csv("${2:.\\\\\\\\data\\\\\\\\output.csv}", index=False, encoding="utf-8")$3
+               """
+    'py_pandas_cleaning':
+        'prefix': 'pandascleaning'
+        'body':"""
+                ${1:df}.rename(columns={"col1": "colX"}, inplace=True)$2
+                ${1:df}["col1_date"] = pd.to_datetime(${1:df}["col1"])
+                ${1:df}.drop(columns=["col1", "col2"], inplace=True)
+                ${1:df}.dtypes
+
+                # ${1:df}.dropna(inplace=True)
+                # ${1:df}.fillna(0, inplace=True)
+
+                ${1:df} = ${1:df}.reset_index().set_index(["key1", "key2"]).sort_index()
+                # ${1:df}.reset_index()
+
+                # ${1:df}.sort_values(["key1", "key2"], ascending=[True, True], inplace=True)
+               """
+    'py_pandas_index':
+        'prefix': 'pandasindex'
+        'body':"""
+                ${1:df} = ${1:df}.reset_index().set_index([${2:"key1", "key2"}]).sort_index()
+                ${1:df}.index()$3
+               """
+    'py_pandas_sort':
+        'prefix': 'pandassort'
+        'body':"""
+                ${1:df}.sort_values([${2:"key1", "key2"}], ascending=[True, True], inplace=True)$3
+               """
+    'py_pandas_plot':
+        'prefix': 'pandasplot'
+        'body':"""
+                ${1:df}.plot(kind="${2:bar}", x="${3:key1}", y=[${4:"val1", "val2"}])$5
+               """
+    'py_pandas_groupby':
+        'prefix': 'pandasgroupby'
+        'body':"""
+                ${1:df}_groupby = ${1:df}.groupby([${2:"key1", "key2"}], as_index=False)
+                ${3:df_conv} = ${1:df}_groupby.agg({
+                    ${4:"val1": "sum",
+                    "val2": "mean"}
+                })
+               """
+    'py_pandas_merge':
+        'prefix': 'pandasmerge'
+        'body':"""
+                ${1:df} = pd.merge(${2:df_left}, ${3:df_right}, how="inner", on=["${4:key1}"])
+                $5
+               """
+    'py_pandas_dummy':
+        'prefix': 'pandasdummy'
+        'body':"""
+                ${2:df_dummy} = pd.get_dummies(${1:df}, columns=["${3:col1}"])
+                ${2:df_dummy}.head()$4
+               """
+    'py_pandas_query':
+        'prefix': 'pandasquery'
+        'body':'${1:df}[(${1:df}["${3:col1}"] <=$4 100)${2: & (${1:df}["col2"] == 1)}]'
+
+    'py_boto3_session':
+        'prefix': 'boto3session'
+        'body':"""
+                ${1:from boto3.session import Session
+                }session = Session(aws_access_key_id="$3",
+                                  aws_secret_access_key="$4",
+                                  region_name="${5:ap-northeast-1}")
+                ${2:s3} = session.resource("${2:s3}")
+                ${2:s3} = session.client("${2:s3}")$6
+                
+               """
