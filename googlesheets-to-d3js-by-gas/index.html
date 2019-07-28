@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+.node ellipse,rect {
+  stroke: white;
+  stroke-width: 1.5px;
+  opacity: 1.0;
+}
+
+line {
+  stroke: black;
+  stroke-width: 2px;
+  stroke-opacity: 1.0;
+}
+
+</style>
+<body>
+<script src="https://d3js.org/d3.v3.js"></script>
+<script>
+
+var param=JSON.parse(<?=param?>);
+
+data = {
+        nodes: param.data.nodes,
+        links: param.data.links
+};
+
+var mouseOverFunction = function(d) {
+  var circle = d3.select(this);
+
+  node
+    .transition(500)
+      .style("opacity", function(o) {
+        return isConnected(o, d) ? 1.0 : 0.2 ;
+      })
+      .style("fill", function(o) {
+        if (isConnectedAsTarget(o, d) && isConnectedAsSource(o, d) ) {
+          fillcolor = "yellowgreen";
+        } else if (isConnectedAsSource(o, d)) {
+          fillcolor = "red";
+        } else if (isConnectedAsTarget(o, d)) {
+          fillcolor = "lightblue";
+        } else if (isEqual(o, d)) {
+          fillcolor = "hotpink";
+        } else {
+          fillcolor = "#000";
+        }
+        return fillcolor;
+      });
+
+  link
+    .transition(500)
+      .style("opacity", function(o) {
+        return o.source === d || o.target === d ? 1 : 0.2;
+      })
+     /* .transition(500)
+      .attr("marker-end", function(o) {
+        return o.source === d || o.target === d ? "url(#arrowhead)" : "url()";
+    }) */
+    ;
+
+  // ★３：nodeの形状の種類を追加
+  /* circle
+    .transition(500)
+      .attr("r", function(){ return 3 * node_radius(d)}); */
+
+  if (circle.node().nodeName === "ellipse") {
+    circle
+      .transition(500)
+        .attr("rx", d => node_radius(d) * 3);
+  } else {
+    circle
+      .transition(500)
+        .attr("width", d => node_radius(d) * 5)
+        .attr("x", d => -(node_radius(d) * 5 / 2));
+    }
+}
+
+var mouseOutFunction = function() {
+  var circle = d3.select(this);
+
+  node
+    .transition(500);
+
+  link
+    .transition(500);
+
+  // ★３：nodeの形状の種類を追加
+  /* circle
+    .transition(500)
+      .attr("r", node_radius); */
+
+  if (circle.node().nodeName === "ellipse") {
+    circle
+      .transition(500)
+        .attr("rx", node_radius);
+  } else {
+    circle
+      .transition(500)
+        .attr("width", d => node_radius(d) * 3)
+        .attr("x", d => -(node_radius(d) * 3 / 2));
+  }
+}
+
+// ★４：クリック時の動作を追加
+var mouseDownFunction = function(d) {
+    console.log(d);
+
+    navigator.clipboard.writeText(d.id); // Chromeのみ動作確認済み
+}
+
+function isConnected(a, b) {
+    return isConnectedAsTarget(a, b) || isConnectedAsSource(a, b) || a.index == b.index;
+}
+
+function isConnectedAsSource(a, b) {
+    return linkedByIndex[a.index + "," + b.index];
+}
+
+function isConnectedAsTarget(a, b) {
+    return linkedByIndex[b.index + "," + a.index];
+}
+
+function isEqual(a, b) {
+    return a.index == b.index;
+}
+
+function tick() {
+  link
+    .attr("x1", function(d) { return d.source.x; })
+    .attr("y1", function(d) { return d.source.y; })
+    .attr("x2", function(d) { return d.target.x; })
+    .attr("y2", function(d) { return d.target.y; });
+
+  node
+    .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+
+  // ★１：ラベルを追加
+  label
+    .attr({
+        x: d => d.x ,
+        y: d => d.y
+    });
+
+}
+
+function node_radius(d) { return Math.pow(40.0 * d.size, 1/3); }
+
+var width = param.display.svgSize || 1200;
+var height = param.display.svgSize || 1200;
+
+var nodes = data.nodes
+var links = data.links
+
+var force = d3.layout.force()
+              .nodes(nodes)
+              .links(links)
+              .charge(-4000)
+              .distance(200)
+              .friction(0.5)
+              .gravity(0.2)
+              .size([width, height])
+              .start();
+
+var linkedByIndex = {};
+links.forEach(function(d) {
+  linkedByIndex[d.source.index + "," + d.target.index] = true;
+});
+
+var svg = d3.select("body").append("svg")
+            .attr("width", width)
+            .attr("height", height);
+
+var link = svg.selectAll("line")
+              .data(links)
+            .enter().append("line")
+
+var node = svg.selectAll(".node")
+              .data(nodes)
+            .enter().append("g")
+              .attr("class", "node")
+              .call(force.drag);
+
+// ★３：nodeの形状の種類を追加
+/* node
+  .append("circle")
+  .attr("r", node_radius)
+  .on("mouseover", mouseOverFunction)
+  .on("mouseout", mouseOutFunction); */
+
+node.filter(d => d.shape === "ellipse") // 楕円のnode
+    .append("ellipse")
+    .attr("rx", node_radius)
+    .attr("ry", d => node_radius(d) * (d.height || 1))
+    .on("mouseover", mouseOverFunction)
+    .on("mouseout", mouseOutFunction)
+    .on('mousedown', mouseDownFunction); // ★４：クリック時の動作を追加
+node.filter(d => !d.shape || d.shape !== "ellipse") // （楕円以外は、）長方形のnode
+    .append("rect")
+    .attr("width", d => node_radius(d) * 3)
+    .attr("height", node_radius)
+    .attr("x", d => -(node_radius(d) * 3 / 2))
+    .attr("y", d => -(node_radius(d) / 2))
+    .on("mouseover", mouseOverFunction)
+    .on("mouseout", mouseOutFunction)
+    .on('mousedown', mouseDownFunction); // ★４：クリック時の動作を追加
+
+// ★１：ラベルを追加
+var label = svg.selectAll("text")
+               .data(nodes)
+             .enter().append("text")
+               .attr({
+                   "text-anchor":"middle",
+                   "fill":"black",
+                   "font-size": param.display.labelFontSize || "12px"
+               })
+               .html(d => d.label);
+
+// ★２：ツールチップを追加
+node.append("title")
+  .text(d => d.title);
+
+svg
+  .append("marker")
+  .attr("id", "arrowhead")
+  .attr("refX", 45) // Controls the shift of the arrow head along the path
+  .attr("refY", 2)
+  .attr("markerWidth", 6)
+  .attr("markerHeight", 4)
+  .attr("orient", "auto")
+  .append("path")
+    .attr("d", "M 0,0 V 4 L6,2 Z");
+
+link
+  .attr("marker-end", "url(#arrowhead)");
+
+force
+  .on("tick", tick);
+
+console.info("◆凡例"
+            + "\n・ピンク：選択中の要素\n・赤：依存している/先行の要素\n・青：依存されている/後続の要素"
+            + "\n◆クリックアクション"
+            + "\n・IDをクリップボードにコピー\n・コンソールに情報をログ出力");
+
+</script>
+</body>
